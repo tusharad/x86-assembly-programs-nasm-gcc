@@ -1,30 +1,70 @@
 ;; Assembly program to addition of array elements	
-	section .data
-	Array dd 10,20,30,40,-1
-	msg db "Input number is %d",10,0
-	section .text
+section .data
+	getN db "Enter how many elements: ",0
+	input db "%d",0
+	output db "Addition of array is %d",10,0
+section .bss
+	array resd 10
+	n resd 1
+section .text
 	global main
-	extern printf
+	extern printf,scanf
 main:
-	xor ecx,ecx 		;;make ecx 0
-	xor esi,esi
-lp:	
-	mov ebx,Array 		;;Put address of array in ebx
-	mov eax,4 		;;size
-	mul ecx 		;;(index*size)
-	add ebx,eax 		;;base + mulResult
-	cmp dword[ebx],-1
-	jz endof
-	add esi,dword[ebx]
-	pusha			;; pushing all register values in stack
-	popa			;; poping back all previous register values
+	;; Display getN message
+	push getN
+	call printf
+	add esp,4
+
+	;;Scanf
+	push n
+	push input
+	call scanf
+	add esp,8
+
+	;;Get n elements from user
+	
+	xor ecx,ecx
+scan:
+	;;Calculate array location
+	mov ebx,array
+	mov eax,4
+	mul ecx
+	add ebx,eax
+	
+	;;scanf("%d",&arr[i]);
+	pusha
+	push ebx
+	push input
+	call scanf
+	add esp,8
+	popa
+
+
 	inc ecx
-	jmp lp
+	cmp ecx,dword[n]
+	jl scan
+
+;;adding
+	xor ecx,ecx
+	xor esi,esi
+while:
+	mov ebx,array
+	mov eax,4
+	mul ecx
+	add ebx,eax
+
+	add esi,dword[ebx]
+	
+	inc ecx
+	cmp ecx,dword[n]
+	jl while	
 endof:	
+	pusha
 	push esi
-	push msg 
+	push output
 	call printf
 	add esp,8
-	
+	popa
+
 	ret
 	

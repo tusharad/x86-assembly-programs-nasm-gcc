@@ -1,27 +1,77 @@
 ;; Assembly program to print array elements
-	section .data
-	Array dd 10,20,30,40,-1
-	msg db "Input number is %d",10,0
-	section .text
+section .data
+	getN db "Enter how many elements: ",0
+	input db "%d",0
+	printArr db "Array elements are",10,0
+	output db "%d",10,0
+section .bss
+	array resd 10
+	n resd 1
+section .text
 	global main
-	extern printf
+	extern printf,scanf
 main:
-	xor ecx,ecx 		;;make ecx 0
-lp:	
-	mov ebx,Array 		;;Put address of array in ebx
-	mov eax,4 		;;size
-	mul ecx 		;;(index*size)
-	add ebx,eax 		;;base + mulResult
-	cmp dword[ebx],-1
-	jz endof
-	pusha			;; pushing all register values in stack
+	;; Display getN message
+	push getN
+	call printf
+	add esp,4
+
+	;;Scanf
+	push n
+	push input
+	call scanf
+	add esp,8
+
+	;;Get n elements from user
+	
+	xor ecx,ecx
+scan:
+	;;Calculate array location
+	mov ebx,array
+	mov eax,4
+	mul ecx
+	add ebx,eax
+	
+	;;scanf("%d",&arr[i]);
+	pusha
+	push ebx
+	push input
+	call scanf
+	add esp,8
+	popa
+
+
+	inc ecx
+	cmp ecx,dword[n]
+	jl scan
+
+
+;;print array message
+	pusha
+	push printArr
+	call printf
+	add esp,4
+	popa
+
+;;printing array
+	xor ecx,ecx
+while:
+	mov ebx,array
+	mov eax,4
+	mul ecx
+	add ebx,eax
+
+	pusha
 	push dword[ebx]
-	push msg 
+	push output
 	call printf
 	add esp,8
-	popa			;; poping back all previous register values
+	popa
+
 	inc ecx
-	jmp lp
+	cmp ecx,dword[n]
+	jl while	
+
 endof:	
 	ret
 	
