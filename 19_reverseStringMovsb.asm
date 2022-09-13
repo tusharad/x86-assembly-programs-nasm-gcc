@@ -15,9 +15,9 @@ main:
 
 while:
 	std			;; set esi direction in reverse
-	lodsb			;; copy character 
-	cld			;; decrement esi
-	stosb			;; paste character in edi
+	lodsb			;; Copy character from esi to AL
+	cld			;; Clear direction flag.
+	stosb			;; paste character from AL to edi
 	loop while		;; decrement ecx and jmp to while
 
 	;;print the msg
