@@ -8,7 +8,7 @@ main:
 	mov ecx,5
 	mov eax,1
 lp:
-	mul ecx
+	mul ecx		;;eax = eax*ecx
 	cmp ecx,1
 	jz endof
 	dec ecx
