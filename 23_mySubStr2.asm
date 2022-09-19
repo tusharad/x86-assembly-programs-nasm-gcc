@@ -1,55 +1,61 @@
 ;; Assembly program to find if substring exists in a string with spaces
 
 section .data
-	first db "this is a string ",0
-	second db "string",0
-	found db "string found",0
-	notFound db "string not found",0
+	msg db "this is a string",0
+	len equ $-msg
+	msg2 db "string",0
+	found db "substring found",0
+	notfound db "substring not found",0
 section .text
 	global main
-	extern puts
+	extern printf
 main:
-	mov esi,first
-	mov ebx,second
-while:
-	mov al,byte[esi]
+	mov esi,msg
+	mov edi,msg2
+
+lp:
+	mov al,byte[edi]
+	cmp byte[esi],al
+	jnz moveToSpace	
+
+	inc esi
+	inc edi
+
+	cmp byte[edi],0
+	jz printTrue
+
 	cmp byte[esi],0
 	jz printFalse
-	cmp al,byte[ebx]
-	jnz jumpToNextWord
-	inc ebx
-	jmp endOfIfElse
-jumpToNextWord:
-	mov ebx,second
-while2:
-	cmp byte[esi],0
-	jz endOfIfElse
-	cmp byte[esi],0
-	jz endOfIfElse
-	inc esi
-	jmp while2
 
-endOfIfElse:
-	inc esi
-	cmp ebx,0
-	jz checkFirst
-	cmp ebx,0
-	jnz endOfIf
-checkFirst:
-	cmp byte[esi],0
-	jz printTrue
+	jmp lp
+
+moveToSpace:
+	mov edi,msg2
 	cmp byte[esi],' '
-	jz printTrue
-endOfIf:
-	jmp while
-printFalse:
-	push notFound
-	call puts
-	add esp,4
-	jmp endof
+	jz goBacktolp
+	cmp byte[esi],0
+	jz printFalse
+	inc esi
+	jmp moveToSpace
+
+goBacktolp:
+	inc esi
+	jmp lp
+
 printTrue:
+	pusha
 	push found
-	call puts
+	call printf
 	add esp,4
+	popa
+	jmp endof
+
+printFalse:
+	pusha
+	push notfound
+	call printf
+	add esp,4
+	popa
+
 endof:
 	ret
